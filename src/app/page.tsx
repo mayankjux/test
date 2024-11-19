@@ -17,6 +17,13 @@ const pages: ProjectPage[] = [
     category: "Layout",
     date: "2024-03-20",
   },
+  {
+    title: "Student Management",
+    description: "A comprehensive admin dashboard for managing student data, including attendance, fees, and academic performance",
+    path: "/student-management",
+    category: "Dashboard",
+    date: "2024-03-21",
+  },
   // Add more pages here as you create them
 ];
 
