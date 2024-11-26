@@ -24,6 +24,7 @@ import {
   Mail,
   Car,
   Footprints,
+  Eye,
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import React from 'react';
@@ -76,6 +77,7 @@ interface TransportPerson {
   name: string;
   relationship: string;
   phone: string;
+  address?: string;
   isGuardian: boolean;
   guardianId?: number;
 }
@@ -242,6 +244,38 @@ const relationshipOptions = [
   { id: 'other', name: 'Other' },
 ] as const;
 
+// Add this interface near the other interfaces
+interface Bus {
+  id: string;
+  number: string;
+  capacity: number;
+  route: string;
+}
+
+// Add this constant with the buses data
+const buses: Bus[] = [
+  { id: 'bus1', number: 'KA01-1234', capacity: 40, route: 'Route 1' },
+  { id: 'bus2', number: 'KA01-5678', capacity: 35, route: 'Route 2' },
+  { id: 'bus3', number: 'KA01-9012', capacity: 42, route: 'Route 3' },
+  { id: 'bus4', number: 'KA01-3456', capacity: 38, route: 'Route 4' },
+];
+
+// First, add this interface near the other interfaces
+interface DocumentType {
+  id: string;
+  name: string;
+  description?: string;
+}
+
+// Add this constant with the document types
+const documentTypes: DocumentType[] = [
+  { id: 'birthCertificate', name: 'Birth Certificate' },
+  { id: 'academicRecords', name: 'Previous Academic Records' },
+  { id: 'addressProof', name: 'Address Proof' },
+  { id: 'medicalCertificate', name: 'Medical Certificate' },
+  { id: 'other', name: 'Other Supporting Documents' },
+];
+
 const AddStudentPage = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<StudentFormData>({
@@ -307,7 +341,13 @@ const AddStudentPage = () => {
       otherDocuments: [],
     },
     dropOffPoint: '',
-    transportPersons: [],
+    transportPersons: [{
+      name: '',
+      relationship: '',
+      phone: '',
+      address: '',
+      isGuardian: false  // Changed from true to false
+    }],
   });
 
   const [openMenuIndex, setOpenMenuIndex] = useState<number | null>(null);
@@ -471,7 +511,7 @@ const AddStudentPage = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                  Roll Number <span className="text-[#7A7D81]">(Optional)</span>
+                  Roll Number
                 </label>
                 <input
                   type="text"
@@ -486,7 +526,7 @@ const AddStudentPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                  Date of Birth <span className="text-red-500">*</span>
+                  Date of Birth
                 </label>
                 <div className="relative">
                   <input
@@ -494,7 +534,6 @@ const AddStudentPage = () => {
                     value={formData.dateOfBirth}
                     onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
                     className={`${inputClasses} appearance-none [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-4 [&::-webkit-calendar-picker-indicator]:top-1/2 [&::-webkit-calendar-picker-indicator]:-translate-y-1/2 [&::-webkit-calendar-picker-indicator]:w-5 [&::-webkit-calendar-picker-indicator]:h-5 [&::-webkit-calendar-picker-indicator]:cursor-pointer`}
-                    required
                   />
                   <Calendar 
                     className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[#4D4F52] pointer-events-none" 
@@ -504,13 +543,12 @@ const AddStudentPage = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                  Gender <span className="text-red-500">*</span>
+                  Gender
                 </label>
                 <select
                   value={formData.gender}
                   onChange={(e) => handleInputChange('gender', e.target.value as 'Male' | 'Female' | 'Other')}
                   className={inputClasses}
-                  required
                 >
                   <option value="" disabled>Select gender</option>
                   <option value="Male">Male</option>
@@ -520,23 +558,58 @@ const AddStudentPage = () => {
               </div>
             </div>
 
+            {/* Email and Contact Number */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-[#4D4F52] mb-2">
+                  Email Address <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  className={inputClasses}
+                  placeholder="Enter email address"
+                  required
+                />
+                <p className="mt-2 text-sm text-[#7A7D81]">
+                  Access credentials for the student account will be sent to this email address.
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#4D4F52] mb-2">
+                  Contact Number <span className="text-[#7A7D81]">(Optional)</span>
+                </label>
+                <input
+                  type="tel"
+                  value={formData.contactNumber}
+                  onChange={(e) => handleInputChange('contactNumber', e.target.value)}
+                  className={inputClasses}
+                />
+              </div>
+            </div>
+
+            {/* Separator */}
+            <div>
+              <div className="w-full border-t border-[#E4E8EA]"></div>
+            </div>
+
             {/* Nationality, Aadhaar and APAAR Number */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
                 <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                  Nationality <span className="text-red-500">*</span>
+                  Nationality
                 </label>
                 <input
                   type="text"
                   value={formData.nationality}
                   onChange={(e) => handleInputChange('nationality', e.target.value)}
                   className={inputClasses}
-                  required
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                  Aadhaar Number <span className="text-red-500">*</span>
+                  Aadhaar Number
                 </label>
                 <input
                   type="text"
@@ -545,7 +618,6 @@ const AddStudentPage = () => {
                   className={inputClasses}
                   placeholder="XXXX XXXX XXXX"
                   maxLength={14}
-                  required
                 />
               </div>
               <div>
@@ -571,14 +643,13 @@ const AddStudentPage = () => {
               <div className="grid grid-cols-1 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                    Address Line 1 <span className="text-red-500">*</span>
+                    Address Line 1
                   </label>
                   <input
                     type="text"
                     value={formData.residentialAddress.line1}
                     onChange={(e) => handleAddressChange('residential', 'line1', e.target.value)}
                     className={inputClasses}
-                    required
                   />
                 </div>
                 <div>
@@ -595,51 +666,47 @@ const AddStudentPage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                      Country <span className="text-red-500">*</span>
+                      Country
                     </label>
                     <CountrySelect
                       value={formData.residentialAddress.country}
                       onChange={(value) => handleAddressChange('residential', 'country', value)}
                       className={inputClasses}
-                      required
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                      State <span className="text-red-500">*</span>
+                      State
                     </label>
                     <input
                       type="text"
                       value={formData.residentialAddress.state}
                       onChange={(e) => handleAddressChange('residential', 'state', e.target.value)}
                       className={inputClasses}
-                      required
                     />
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                      City <span className="text-red-500">*</span>
+                      City
                     </label>
                     <input
                       type="text"
                       value={formData.residentialAddress.city}
                       onChange={(e) => handleAddressChange('residential', 'city', e.target.value)}
                       className={inputClasses}
-                      required
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                      Postal Code <span className="text-red-500">*</span>
+                      Postal Code
                     </label>
                     <input
                       type="text"
                       value={formData.residentialAddress.postalCode}
                       onChange={(e) => handleAddressChange('residential', 'postalCode', e.target.value)}
                       className={inputClasses}
-                      required
                     />
                   </div>
                 </div>
@@ -673,14 +740,13 @@ const AddStudentPage = () => {
                 <div className="grid grid-cols-1 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                      Address Line 1 <span className="text-red-500">*</span>
+                      Address Line 1
                     </label>
                     <input
                       type="text"
                       value={formData.permanentAddress.line1}
                       onChange={(e) => handleAddressChange('permanent', 'line1', e.target.value)}
                       className={inputClasses}
-                      required
                     />
                   </div>
                   <div>
@@ -697,89 +763,52 @@ const AddStudentPage = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                        Country <span className="text-red-500">*</span>
+                        Country
                       </label>
                       <CountrySelect
                         value={formData.permanentAddress.country}
                         onChange={(value) => handleAddressChange('permanent', 'country', value)}
                         className={inputClasses}
-                        required
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                        State <span className="text-red-500">*</span>
+                        State
                       </label>
                       <input
                         type="text"
                         value={formData.permanentAddress.state}
                         onChange={(e) => handleAddressChange('permanent', 'state', e.target.value)}
                         className={inputClasses}
-                        required
                       />
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                        City <span className="text-red-500">*</span>
+                        City
                       </label>
                       <input
                         type="text"
                         value={formData.permanentAddress.city}
                         onChange={(e) => handleAddressChange('permanent', 'city', e.target.value)}
                         className={inputClasses}
-                        required
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                        Postal Code <span className="text-red-500">*</span>
+                        Postal Code
                       </label>
                       <input
                         type="text"
                         value={formData.permanentAddress.postalCode}
                         onChange={(e) => handleAddressChange('permanent', 'postalCode', e.target.value)}
                         className={inputClasses}
-                        required
                       />
                     </div>
                   </div>
                 </div>
               )}
-            </div>
-
-            {/* Contact Information */}
-            <div>
-              <h3 className="text-lg font-semibold text-[#0D373D] mb-4">Contact Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                    Email Address <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
-                    className={inputClasses}
-                    required
-                  />
-                  <p className="mt-2 text-sm text-[#7A7D81]">
-                    Access credentials for the student account will be sent to this email address.
-                  </p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                    Contact Number <span className="text-[#7A7D81]">(Optional)</span>
-                  </label>
-                  <input
-                    type="tel"
-                    value={formData.contactNumber}
-                    onChange={(e) => handleInputChange('contactNumber', e.target.value)}
-                    className={inputClasses}
-                  />
-                </div>
-              </div>
             </div>
 
             {/* Emergency Contact */}
@@ -788,25 +817,23 @@ const AddStudentPage = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                    Name <span className="text-red-500">*</span>
+                    Name
                   </label>
                   <input
                     type="text"
                     value={formData.emergencyContact.name}
                     onChange={(e) => handleInputChange('emergencyContact.name', e.target.value)}
                     className={inputClasses}
-                    required
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                    Relationship <span className="text-red-500">*</span>
+                    Relationship
                   </label>
                   <select
                     value={formData.emergencyContact.relationship}
                     onChange={(e) => handleInputChange('emergencyContact.relationship', e.target.value)}
                     className={inputClasses}
-                    required
                   >
                     <option value="">Select relationship</option>
                     {relationshipOptions.map(option => (
@@ -818,14 +845,13 @@ const AddStudentPage = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                    Phone Number <span className="text-red-500">*</span>
+                    Phone Number
                   </label>
                   <input
                     type="tel"
                     value={formData.emergencyContact.phone}
                     onChange={(e) => handleInputChange('emergencyContact.phone', e.target.value)}
                     className={inputClasses}
-                    required
                   />
                 </div>
               </div>
@@ -953,7 +979,7 @@ const AddStudentPage = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                        Guardian Name <span className="text-red-500">*</span>
+                        Guardian Name
                       </label>
                       <input
                         type="text"
@@ -970,13 +996,12 @@ const AddStudentPage = () => {
                           }));
                         }}
                         className={inputClasses}
-                        required
                       />
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                        Relationship <span className="text-red-500">*</span>
+                        Relationship
                       </label>
                       <select
                         value={guardian.relationship}
@@ -992,7 +1017,6 @@ const AddStudentPage = () => {
                           }));
                         }}
                         className={inputClasses}
-                        required
                       >
                         <option value="">Select relationship</option>
                         {relationshipOptions.map(option => (
@@ -1005,7 +1029,7 @@ const AddStudentPage = () => {
 
                     <div>
                       <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                        Contact Number <span className="text-red-500">*</span>
+                        Contact Number
                       </label>
                       <input
                         type="tel"
@@ -1022,14 +1046,13 @@ const AddStudentPage = () => {
                           }));
                         }}
                         className={inputClasses}
-                        required
                         placeholder="Phone number"
                       />
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                        Email Address <span className="text-red-500">*</span>
+                        Email Address
                       </label>
                       <input
                         type="email"
@@ -1046,14 +1069,13 @@ const AddStudentPage = () => {
                           }));
                         }}
                         className={inputClasses}
-                        required
                       />
                     </div>
 
                     {/* Address field moved to bottom and spans full width */}
                     <div className="col-span-full">
                       <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                        Address <span className="text-red-500">*</span>
+                        Address
                       </label>
                       <textarea
                         value={guardian.address || ''}
@@ -1070,7 +1092,6 @@ const AddStudentPage = () => {
                         }}
                         placeholder="Enter complete address"
                         className={`${inputClasses} min-h-[80px] resize-y`}
-                        required
                       />
                     </div>
                   </div>
@@ -1119,7 +1140,7 @@ const AddStudentPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                  Grade/Class <span className="text-red-500">*</span>
+                  Grade/Class
                 </label>
                 <select
                   value={formData.grade}
@@ -1137,7 +1158,6 @@ const AddStudentPage = () => {
                     }
                   }}
                   className={inputClasses}
-                  required
                 >
                   <option value="">Select grade</option>
                   {grades.map(grade => (
@@ -1150,13 +1170,12 @@ const AddStudentPage = () => {
 
               <div>
                 <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                  Academic Year <span className="text-red-500">*</span>
+                  Academic Year
                 </label>
                 <select
                   value={formData.academicYear}
                   onChange={(e) => handleInputChange('academicYear', e.target.value)}
                   className={inputClasses}
-                  required
                 >
                   {[0, 1, 2].map((offset) => {
                     const year = new Date().getFullYear() + offset;
@@ -1174,7 +1193,7 @@ const AddStudentPage = () => {
             {/* Section */}
             <div>
               <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                Section <span className="text-red-500">*</span>
+                Section
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {sections.map(section => (
@@ -1200,7 +1219,6 @@ const AddStudentPage = () => {
                       checked={formData.section === section}
                       onChange={() => {}} // Empty onChange to prevent React warning
                       className="absolute opacity-0"
-                      required
                     />
                     <span className={`
                       text-base font-medium
@@ -1248,7 +1266,7 @@ const AddStudentPage = () => {
             {/* Subjects */}
             <div>
               <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                Subjects <span className="text-red-500">*</span>
+                Subjects
               </label>
               <div className="space-y-4">
                 {/* Core Subjects */}
@@ -1410,7 +1428,7 @@ const AddStudentPage = () => {
             {/* Transport Mode Selection */}
             <div>
               <label className="block text-sm font-medium text-[#4D4F52] mb-4">
-                Transport Mode <span className="text-red-500">*</span>
+                Transport Mode
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
@@ -1439,7 +1457,6 @@ const AddStudentPage = () => {
                       checked={formData.transportMode === mode}
                       onChange={() => {}} // Empty onChange to prevent React warning
                       className="absolute opacity-0"
-                      required
                     />
                     <div className="flex items-center gap-2">
                       <Icon 
@@ -1473,7 +1490,7 @@ const AddStudentPage = () => {
                           ...prev,
                           transportPersons: [
                             ...prev.transportPersons,
-                            { name: '', relationship: '', phone: '', isGuardian: false }
+                            { name: '', relationship: '', phone: '', address: '', isGuardian: false }
                           ]
                         }));
                       }}
@@ -1485,53 +1502,46 @@ const AddStudentPage = () => {
                   </div>
 
                   <div className="space-y-4">
-                    {formData.transportPersons.map((person, index) => (
-                      <div 
-                        key={index}
-                        className="border border-[#E4E8EA] rounded-xl p-4 space-y-4"
-                      >
-                        <div className="flex items-center justify-between">
-                          <h4 className="text-sm font-medium text-[#4D4F52]">
-                            Person {index + 1}
-                          </h4>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setFormData(prev => ({
-                                ...prev,
-                                transportPersons: prev.transportPersons.filter((_, i) => i !== index)
-                              }));
-                            }}
-                            className="p-2 hover:bg-red-50 rounded-full"
-                          >
-                            <X size={16} className="text-red-500" />
-                          </button>
-                        </div>
-
-                        {/* Select from Guardians or Add New */}
-                        <div>
-                          <label className="inline-flex items-center mb-4">
-                            <input
-                              type="checkbox"
-                              checked={person.isGuardian}
-                              onChange={(e) => {
-                                const newPersons = [...formData.transportPersons];
-                                newPersons[index] = {
-                                  ...newPersons[index],
-                                  isGuardian: e.target.checked
-                                };
+                    {formData.transportPersons.length > 0 ? (
+                      formData.transportPersons.map((person, index) => (
+                        <div key={index} className="border border-[#E4E8EA] rounded-xl p-4 space-y-4">
+                          <div className="flex items-center justify-between">
+                            <label className="inline-flex items-center">
+                              <input
+                                type="checkbox"
+                                checked={person.isGuardian}
+                                onChange={(e) => {
+                                  const newPersons = [...formData.transportPersons];
+                                  newPersons[index] = {
+                                    ...newPersons[index],
+                                    isGuardian: e.target.checked
+                                  };
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    transportPersons: newPersons
+                                  }));
+                                }}
+                                className="rounded border-[#E4E8EA] text-[#0D373D] focus:ring-[#0D373D]"
+                              />
+                              <span className="ml-2 text-sm text-[#4D4F52]">
+                                Select from existing guardians
+                              </span>
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => {
                                 setFormData(prev => ({
                                   ...prev,
-                                  transportPersons: newPersons
+                                  transportPersons: prev.transportPersons.filter((_, i) => i !== index)
                                 }));
                               }}
-                              className="rounded border-[#E4E8EA] text-[#0D373D] focus:ring-[#0D373D]"
-                            />
-                            <span className="ml-2 text-sm text-[#4D4F52]">
-                              Select from existing guardians
-                            </span>
-                          </label>
+                              className="p-2 hover:bg-red-50 rounded-full"
+                            >
+                              <X size={16} className="text-red-500" />
+                            </button>
+                          </div>
 
+                          {/* Guardian selector or manual input fields */}
                           {person.isGuardian ? (
                             <select
                               value={person.guardianId}
@@ -1560,82 +1570,116 @@ const AddStudentPage = () => {
                               ))}
                             </select>
                           ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                              <div>
-                                <input
-                                  type="text"
-                                  value={person.name}
-                                  onChange={(e) => {
-                                    const newPersons = [...formData.transportPersons];
-                                    newPersons[index] = {
-                                      ...newPersons[index],
-                                      name: e.target.value
-                                    };
-                                    setFormData(prev => ({
-                                      ...prev,
-                                      transportPersons: newPersons
-                                    }));
-                                  }}
-                                  placeholder="Name"
-                                  className={inputClasses}
-                                />
-                              </div>
-                              <div>
-                                <select
-                                  value={person.relationship}
-                                  onChange={(e) => {
-                                    const newPersons = [...formData.transportPersons];
-                                    newPersons[index] = {
-                                      ...newPersons[index],
-                                      relationship: e.target.value
-                                    };
-                                    setFormData(prev => ({
-                                      ...prev,
-                                      transportPersons: newPersons
-                                    }));
-                                  }}
-                                  className={inputClasses}
-                                >
-                                  <option value="">Select Relationship</option>
-                                  {relationshipOptions.map(option => (
-                                    <option key={option.id} value={option.id}>
-                                      {option.name}
-                                    </option>
-                                  ))}
-                                </select>
-                              </div>
-                              <div>
-                                <input
-                                  type="tel"
-                                  value={person.phone}
-                                  onChange={(e) => {
-                                    const value = e.target.value;
-                                    if (value === '' || (/^\d+$/.test(value) && value.length <= 10)) {
+                            <div className="space-y-4">
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                  <label className="block text-sm font-medium text-[#4D4F52] mb-2">
+                                    Name
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={person.name}
+                                    onChange={(e) => {
                                       const newPersons = [...formData.transportPersons];
                                       newPersons[index] = {
                                         ...newPersons[index],
-                                        phone: value
+                                        name: e.target.value
                                       };
                                       setFormData(prev => ({
                                         ...prev,
                                         transportPersons: newPersons
                                       }));
-                                    }
+                                    }}
+                                    placeholder="Name"
+                                    className={inputClasses}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-sm font-medium text-[#4D4F52] mb-2">
+                                    Relationship
+                                  </label>
+                                  <select
+                                    value={person.relationship}
+                                    onChange={(e) => {
+                                      const newPersons = [...formData.transportPersons];
+                                      newPersons[index] = {
+                                        ...newPersons[index],
+                                        relationship: e.target.value
+                                      };
+                                      setFormData(prev => ({
+                                        ...prev,
+                                        transportPersons: newPersons
+                                      }));
+                                    }}
+                                    className={inputClasses}
+                                  >
+                                    <option value="">Select Relationship</option>
+                                    {relationshipOptions.map(option => (
+                                      <option key={option.id} value={option.id}>
+                                        {option.name}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </div>
+                                <div>
+                                  <label className="block text-sm font-medium text-[#4D4F52] mb-2">
+                                    Contact Number
+                                  </label>
+                                  <input
+                                    type="tel"
+                                    value={person.phone}
+                                    onChange={(e) => {
+                                      const value = e.target.value;
+                                      if (value === '' || (/^\d+$/.test(value) && value.length <= 10)) {
+                                        const newPersons = [...formData.transportPersons];
+                                        newPersons[index] = {
+                                          ...newPersons[index],
+                                          phone: value
+                                        };
+                                        setFormData(prev => ({
+                                          ...prev,
+                                          transportPersons: newPersons
+                                        }));
+                                      }
+                                    }}
+                                    placeholder="Contact Number"
+                                    className={inputClasses}
+                                  />
+                                </div>
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-[#4D4F52] mb-2">
+                                  Address
+                                </label>
+                                <textarea
+                                  value={person.address || ''}
+                                  onChange={(e) => {
+                                    const newPersons = [...formData.transportPersons];
+                                    newPersons[index] = {
+                                      ...newPersons[index],
+                                      address: e.target.value
+                                    };
+                                    setFormData(prev => ({
+                                      ...prev,
+                                      transportPersons: newPersons
+                                    }));
                                   }}
-                                  placeholder="Contact Number"
-                                  className={inputClasses}
+                                  placeholder="Enter complete address"
+                                  className={`${inputClasses} min-h-[80px] resize-y`}
                                 />
                               </div>
                             </div>
                           )}
                         </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-8 px-4 border-2 border-dashed border-[#E4E8EA] rounded-xl">
+                        <Users size={40} className="mx-auto text-[#7A7D81] mb-3" />
+                        <p className="text-[#4D4F52] font-medium mb-1">No authorized persons added</p>
+                        <p className="text-sm text-[#7A7D81]">
+                          Add persons who are authorized to drop/receive the student
+                        </p>
                       </div>
-                    ))}
-
-                    {formData.transportPersons.length === 0 && (
-                      <p className="text-sm text-[#7A7D81] text-center py-4">
-                        No authorized persons added yet. Click "Add Person" to add someone.
-                      </p>
                     )}
                   </div>
                 </div>
@@ -1650,87 +1694,105 @@ const AddStudentPage = () => {
                   <label className="block text-sm font-medium text-[#4D4F52] mb-2">
                     Bus Number
                   </label>
-                  <input
-                    type="text"
+                  <select
                     value={formData.route || ''}
                     onChange={(e) => handleInputChange('route', e.target.value)}
-                    placeholder="Enter bus number"
                     className={`${inputClasses} w-full md:w-1/2`}
-                  />
+                  >
+                    <option value="">Select Bus</option>
+                    {buses.map((bus) => (
+                      <option key={bus.id} value={bus.id}>
+                        {bus.number} - {bus.route} (Capacity: {bus.capacity})
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 {/* Pickup and Drop-off Points */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Pickup Point */}
+                <div>
+                  {/* Combined Pickup/Drop-off Point */}
                   <div>
                     <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                      Pickup Point
+                      {formData.dropOffPoint !== formData.pickupPoint ? 'Pickup Point' : 'Pickup/Drop-off Point'}
                     </label>
-                    <input
-                      type="text"
-                      value={formData.pickupPoint || ''}
-                      onChange={(e) => handleInputChange('pickupPoint', e.target.value)}
-                      placeholder="Enter pickup location"
-                      className={inputClasses}
-                    />
-                    <p className="mt-2 text-sm text-[#7A7D81]">
-                      Specify a landmark or exact location
-                    </p>
+                    {formData.pickupPoint === formData.residentialAddress.line1 ? (
+                      <div className="p-4 bg-[#F5F8F9] rounded-xl border border-[#E4E8EA]">
+                        <p className="text-[#4D4F52] truncate" title={`${formData.residentialAddress.line1}${formData.residentialAddress.line2 ? `, ${formData.residentialAddress.line2}` : ''}, ${formData.residentialAddress.city}, ${formData.residentialAddress.state}, ${formData.residentialAddress.country} - ${formData.residentialAddress.postalCode}`}>
+                          {formData.residentialAddress.line1}
+                          {formData.residentialAddress.line2 ? `, ${formData.residentialAddress.line2}` : ''}
+                          , {formData.residentialAddress.city}, {formData.residentialAddress.state}
+                          , {formData.residentialAddress.country} - {formData.residentialAddress.postalCode}
+                        </p>
+                      </div>
+                    ) : (
+                      <input
+                        type="text"
+                        value={formData.pickupPoint || ''}
+                        onChange={(e) => handleInputChange('pickupPoint', e.target.value)}
+                        placeholder="Enter location"
+                        className={inputClasses}
+                      />
+                    )}
+                    <div className="flex items-center mt-2">
+                      <input
+                        type="checkbox"
+                        id="sameAsResidentialPickup"
+                        checked={formData.pickupPoint === formData.residentialAddress.line1}
+                        disabled={!formData.residentialAddress.line1}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            handleInputChange('pickupPoint', formData.residentialAddress.line1);
+                          } else {
+                            handleInputChange('pickupPoint', '');
+                          }
+                        }}
+                        className={`rounded border-[#E4E8EA] text-[#0D373D] focus:ring-[#0D373D] 
+                          ${!formData.residentialAddress.line1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      />
+                      <label 
+                        htmlFor="sameAsResidentialPickup" 
+                        className={`ml-2 text-sm ${!formData.residentialAddress.line1 ? 'text-[#7A7D81] cursor-not-allowed' : 'text-[#4D4F52] cursor-pointer'}`}
+                      >
+                        Same as residential address
+                      </label>
+                    </div>
                   </div>
 
-                  {/* Drop-off Point */}
-                  <div>
-                    <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                      Drop-off Point
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.dropOffPoint || ''}
-                      onChange={(e) => handleInputChange('dropOffPoint', e.target.value)}
-                      placeholder="Enter drop-off location"
-                      className={inputClasses}
-                    />
-                  </div>
-                </div>
+                  {/* Option to add different drop-off point */}
+                  <div className="mt-4">
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="differentDropoff"
+                        checked={formData.dropOffPoint !== formData.pickupPoint}
+                        onChange={(e) => {
+                          if (!e.target.checked) {
+                            handleInputChange('dropOffPoint', formData.pickupPoint);
+                          } else {
+                            handleInputChange('dropOffPoint', '');
+                          }
+                        }}
+                        className="rounded border-[#E4E8EA] text-[#0D373D] focus:ring-[#0D373D]"
+                      />
+                      <label htmlFor="differentDropoff" className="ml-2 text-sm text-[#4D4F52]">
+                        Add different drop-off point
+                      </label>
+                    </div>
 
-                {/* Driver Details */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Driver Name */}
-                  <div>
-                    <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                      Driver Name
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.driverName || ''}
-                      onChange={(e) => handleInputChange('driverName', e.target.value)}
-                      placeholder="Enter driver's name"
-                      className={inputClasses}
-                    />
-                  </div>
-
-                  {/* Driver Contact */}
-                  <div>
-                    <label className="block text-sm font-medium text-[#4D4F52] mb-2">
-                      Driver Contact
-                    </label>
-                    <input
-                      type="tel"
-                      value={formData.driverContact || ''}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        // Only allow numbers and limit to 10 digits
-                        if (value === '' || (/^\d+$/.test(value) && value.length <= 10)) {
-                          handleInputChange('driverContact', value);
-                        }
-                      }}
-                      placeholder="Enter 10-digit phone number"
-                      className={inputClasses}
-                    />
-                    {formData.driverContact && formData.driverContact.length !== 10 && (
-                      <p className="mt-2 text-sm text-red-500">
-                        Driver contact must be a 10-digit phone number
-                      </p>
+                    {/* Different Drop-off Point Input */}
+                    {formData.dropOffPoint !== formData.pickupPoint && (
+                      <div className="mt-4">
+                        <label className="block text-sm font-medium text-[#4D4F52] mb-2">
+                          Drop-off Point
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.dropOffPoint || ''}
+                          onChange={(e) => handleInputChange('dropOffPoint', e.target.value)}
+                          placeholder="Enter drop-off location"
+                          className={inputClasses}
+                        />
+                      </div>
                     )}
                   </div>
                 </div>
@@ -1740,114 +1802,201 @@ const AddStudentPage = () => {
         );
       case 'documents':
         return (
-          <div className="space-y-8">
-            {/* Upload Area */}
-            <div className="text-center">
-              <h3 className="text-xl font-semibold text-[#0D373D] mb-2">
-                Upload Documents
-              </h3>
-              <p className="text-[#7A7D81]">
-                Drag and drop your documents into the box below or click to select files for upload.
-              </p>
-            </div>
+          <div className="flex gap-6">
+            {/* Upload Area - Now on the left side */}
+            <div className="w-3/4 space-y-8">
+              <div className="text-center">
+                <h3 className="text-xl font-semibold text-[#0D373D] mb-2">
+                  Upload Documents
+                </h3>
+                <p className="text-[#7A7D81]">
+                  Drag and drop your documents into the box below or click to select files for upload.
+                </p>
+              </div>
 
-            {/* Drag and Drop Area */}
-            <div 
-              className={`
-                border-2 border-dashed border-[#E4E8EA] rounded-xl p-8
-                flex flex-col items-center justify-center
-                min-h-[200px] cursor-pointer
-                hover:bg-[#F5F8F9] transition-colors
-                ${isDragging ? 'border-[#0D373D] bg-[#E2FDCB]' : ''}
-              `}
-              onDragOver={(e) => {
-                e.preventDefault();
-                setIsDragging(true);
-              }}
-              onDragLeave={() => setIsDragging(false)}
-              onDrop={(e) => {
-                e.preventDefault();
-                setIsDragging(false);
-                const files = Array.from(e.dataTransfer.files);
-                handleFileUpload(files);
-              }}
-              onClick={() => document.getElementById('fileInput')?.click()}
-            >
-              <UploadIcon size={32} className="text-[#7A7D81] mb-4" />
-              <p className="text-[#4D4F52] mb-2">
-                Drag and drop files here or click to upload
-              </p>
-              <p className="text-sm text-[#7A7D81]">
-                Accepted formats: PDF, JPEG, PNG (Max 10MB)
-              </p>
-              <input
-                id="fileInput"
-                type="file"
-                multiple
-                accept=".pdf,.jpg,.jpeg,.png"
-                onChange={(e) => {
-                  const files = Array.from(e.target.files || []);
+              {/* Drag and Drop Area */}
+              <div 
+                className={`
+                  border-2 border-dashed border-[#E4E8EA] rounded-xl p-8
+                  flex flex-col items-center justify-center
+                  min-h-[200px] cursor-pointer
+                  hover:bg-[#F5F8F9] transition-colors
+                  ${isDragging ? 'border-[#0D373D] bg-[#E2FDCB]' : ''}
+                `}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsDragging(true);
+                }}
+                onDragLeave={() => setIsDragging(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setIsDragging(false);
+                  const files = Array.from(e.dataTransfer.files);
                   handleFileUpload(files);
                 }}
-                className="hidden"
-              />
+                onClick={() => document.getElementById('fileInput')?.click()}
+              >
+                <UploadIcon size={32} className="text-[#7A7D81] mb-4" />
+                <p className="text-[#4D4F52] mb-2">
+                  Drag and drop files here or click to upload
+                </p>
+                <p className="text-sm text-[#7A7D81]">
+                  Accepted formats: PDF, JPEG, PNG (Max 10MB)
+                </p>
+                <input
+                  id="fileInput"
+                  type="file"
+                  multiple
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  onChange={(e) => {
+                    const files = Array.from(e.target.files || []);
+                    handleFileUpload(files);
+                  }}
+                  className="hidden"
+                />
+              </div>
+
+              {/* Uploaded Documents List */}
+              {uploadedFiles.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-medium text-[#4D4F52] mb-4">
+                    Uploaded Documents
+                  </h4>
+                  <div className="space-y-4">
+                    {/* Group files by type */}
+                    {Object.entries(
+                      uploadedFiles.reduce((acc, file) => {
+                        const type = file.type || 'unspecified';
+                        if (!acc[type]) acc[type] = [];
+                        acc[type].push(file);
+                        return acc;
+                      }, {} as Record<string, typeof uploadedFiles>)
+                    ).map(([type, files]) => (
+                      <div 
+                        key={type}
+                        className="border border-[#E4E8EA] rounded-xl p-4"
+                      >
+                        <div className="flex items-start gap-4">
+                          <FileText className="text-[#7A7D81] flex-shrink-0 mt-1" size={24} />
+                          <div className="flex-grow min-w-0">
+                            <div className="flex items-center justify-between mb-3">
+                              <select
+                                value={type}
+                                onChange={(e) => {
+                                  // Update type for all files in this group
+                                  const newType = e.target.value;
+                                  setUploadedFiles(prev => 
+                                    prev.map(f => 
+                                      files.includes(f) ? { ...f, type: newType } : f
+                                    )
+                                  );
+                                }}
+                                className={`${inputClasses} w-64`}
+                                required
+                              >
+                                <option value="">Select Document Type</option>
+                                <option value="birthCertificate">Birth Certificate</option>
+                                <option value="academicRecords">Previous Academic Records</option>
+                                <option value="addressProof">Address Proof</option>
+                                <option value="medicalCertificate">Medical Certificate</option>
+                                <option value="other">Other Supporting Documents</option>
+                              </select>
+                              <button
+                                type="button"
+                                onClick={() => document.getElementById('fileInput')?.click()}
+                                className="p-2 hover:bg-[#F5F8F9] rounded-full transition-colors"
+                                title="Add more documents of this type"
+                              >
+                                <Plus size={20} className="text-[#4D4F52]" />
+                              </button>
+                            </div>
+                            
+                            {/* List of files */}
+                            <div className="space-y-2">
+                              {files.map((file) => (
+                                <div 
+                                  key={file.name} 
+                                  className="flex items-center justify-between py-2 px-3 border border-[#E4E8EA] rounded-lg hover:border-[#0D373D]/20 transition-colors"
+                                >
+                                  <p className="text-sm text-[#4D4F52] truncate" title={file.name}>
+                                    {file.name}
+                                  </p>
+                                  <div className="flex items-center gap-2">
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const objectUrl = URL.createObjectURL(file.file);
+                                        window.open(objectUrl, '_blank');
+                                        setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+                                      }}
+                                      className="p-1.5 hover:bg-[#F5F8F9] rounded-full transition-colors"
+                                      title="Preview document"
+                                    >
+                                      <Eye size={16} className="text-[#4D4F52]" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        if (confirm('Are you sure you want to remove this document?')) {
+                                          setUploadedFiles(prev => prev.filter(f => f !== file));
+                                        }
+                                      }}
+                                      className="p-1.5 hover:bg-red-50 rounded-full"
+                                      title="Remove document"
+                                    >
+                                      <X size={16} className="text-red-500" />
+                                    </button>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Upload Status Messages */}
+              {uploadStatus && (
+                <div className={`
+                  p-4 rounded-xl mt-4
+                  ${uploadStatus.type === 'success' ? 'bg-[#E2FDCB] text-[#0D373D]' : 'bg-red-50 text-red-500'}
+                `}>
+                  {uploadStatus.message}
+                </div>
+              )}
             </div>
 
-            {/* Uploaded Documents List */}
-            {uploadedFiles.length > 0 && (
-              <div>
-                <h4 className="text-sm font-medium text-[#4D4F52] mb-4">
-                  Uploaded Documents
-                </h4>
-                <div className="space-y-4">
-                  {uploadedFiles.map((file, index) => (
-                    <div 
-                      key={index}
-                      className="border border-[#E4E8EA] rounded-xl p-4 flex items-start gap-4"
-                    >
-                      <FileText className="text-[#7A7D81] flex-shrink-0 mt-1" size={24} />
-                      <div className="flex-grow min-w-0">
-                        <div className="flex items-center justify-between">
-                          <p className="text-sm font-medium text-[#4D4F52] truncate" title={file.name}>
-                            {file.name}
-                          </p>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveFile(index)}
-                            className="p-2 hover:bg-red-50 rounded-full ml-2 flex-shrink-0"
-                          >
-                            <X size={20} className="text-red-500" />
-                          </button>
-                        </div>
-                        <select
-                          value={file.type || ''}
-                          onChange={(e) => handleDocumentTypeChange(index, e.target.value)}
-                          className={`${inputClasses} mt-2`}
-                          required
-                        >
-                          <option value="">Select Document Type</option>
-                          <option value="birthCertificate">Birth Certificate</option>
-                          <option value="academicRecords">Previous Academic Records</option>
-                          <option value="addressProof">Address Proof</option>
-                          <option value="medicalCertificate">Medical Certificate</option>
-                          <option value="other">Other Supporting Documents</option>
-                        </select>
-                      </div>
+            {/* Document Types List - Now on the right side */}
+            <div className="w-1/4 space-y-2">
+              <h4 className="text-xs font-medium text-[#4D4F52] mb-3">
+                Required Documents
+              </h4>
+              {documentTypes.map((docType) => {
+                const documentsOfType = uploadedFiles.filter(file => file.type === docType.id);
+                const hasDocuments = documentsOfType.length > 0;
+                const count = documentsOfType.length;
+                
+                return (
+                  <div 
+                    key={docType.id}
+                    className={`p-3 border border-[#E4E8EA] rounded-xl ${hasDocuments ? 'bg-white' : 'bg-[#F5F8F9]'}`}
+                    title={hasDocuments ? `${count} document${count > 1 ? 's' : ''} uploaded` : 'No documents uploaded'}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <p className={`text-sm font-medium ${hasDocuments ? 'text-[#4D4F52]' : 'text-[#7A7D81]'} line-clamp-1`} title={docType.name}>
+                        {docType.name}
+                      </p>
+                      {hasDocuments && (
+                        <Check size={16} className="text-[#0D373D]" />
+                      )}
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Upload Status Messages */}
-            {uploadStatus && (
-              <div className={`
-                p-4 rounded-xl mt-4
-                ${uploadStatus.type === 'success' ? 'bg-[#E2FDCB] text-[#0D373D]' : 'bg-red-50 text-red-500'}
-              `}>
-                {uploadStatus.message}
-              </div>
-            )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         );
       // Add cases for other steps
@@ -1888,14 +2037,8 @@ const AddStudentPage = () => {
       }));
 
       setUploadedFiles(prev => [...prev, ...newFiles]);
-
-      // Update success message based on total number of files
-      const totalFiles = validFiles.length;
-      const fileWord = totalFiles === 1 ? 'file' : 'files';
-      setUploadStatus({
-        type: 'success',
-        message: `${totalFiles} ${fileWord} uploaded successfully.`
-      });
+      // Remove success message
+      setUploadStatus(null);
     }
   };
 
@@ -1910,6 +2053,12 @@ const AddStudentPage = () => {
       setUploadedFiles(prev => prev.filter((_, i) => i !== index));
     }
   };
+
+  // Add this function near the other state hooks
+  const canSubmit = formData.firstName.trim() !== '' && 
+                   formData.lastName.trim() !== '' && 
+                   formData.enrollmentNumber.trim() !== '' &&
+                   formData.email.trim() !== '';
 
   return (
     <>
@@ -2044,7 +2193,22 @@ const AddStudentPage = () => {
               </span>
             </div>
 
-            <div className="flex justify-end">
+            <div className="flex justify-end gap-4">
+              {currentStep !== steps.length - 1 && (
+                <button
+                  type="submit"
+                  form="studentForm"
+                  disabled={!canSubmit}
+                  className={`px-6 py-2.5 rounded-xl transition-colors ${
+                    canSubmit 
+                      ? 'bg-[#E2FDCB] text-[#0D373D] hover:bg-[#D1EBB8]' 
+                      : 'bg-[#F5F8F9] text-[#7A7D81] cursor-not-allowed'
+                  }`}
+                >
+                  Submit
+                </button>
+              )}
+
               <button
                 type={currentStep === steps.length - 1 ? 'submit' : 'button'}
                 form="studentForm"
